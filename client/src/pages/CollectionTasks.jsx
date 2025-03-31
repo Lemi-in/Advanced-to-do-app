@@ -4,8 +4,6 @@ import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../ThemeContext';
 import ProfileDropdown from '../components/ProfileDropdown';
-import dotenv from 'dotenv';
-dotenv.config();
 
 
 export default function CollectionTasks() {
