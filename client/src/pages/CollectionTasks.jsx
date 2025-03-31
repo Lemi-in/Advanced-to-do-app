@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../ThemeContext';
 import ProfileDropdown from '../components/ProfileDropdown';
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 export default function CollectionTasks() {
@@ -34,9 +36,6 @@ export default function CollectionTasks() {
   const [completionFilter, setCompletionFilter] = useState('All');
 
  
-
-
-
   const isSameDate = (d1, d2) => {
     return (
       d1.getFullYear() === d2.getFullYear() &&
@@ -50,7 +49,7 @@ export default function CollectionTasks() {
 
   const fetchCollections = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/collections', {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/collections`, {
         headers: { Authorization: `Bearer ${token}` } ,
       });
       setCollections(res.data);
@@ -61,7 +60,7 @@ export default function CollectionTasks() {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/tasks/collection/${id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/collection/${id}`, {
         headers: { Authorization: `Bearer ${token}` } ,
       });
       const tasksData = res.data.tasks;
@@ -87,7 +86,7 @@ export default function CollectionTasks() {
     if (!newTask.trim()) return;
     try {
       await axios.post(
-        'http://localhost:5000/api/tasks',
+        `${import.meta.env.VITE_BACKEND_URL}/api/tasks`,
         {
           title: newTask,
           dueDate: newDueDate || null,
@@ -113,7 +112,7 @@ export default function CollectionTasks() {
   const handleDelete = async (taskId) => {
     if (!window.confirm('Delete this task and all its subtasks?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/${taskId}`, {
         headers: { Authorization: `Bearer ${token}` } ,
       });
       fetchTasks();
@@ -129,7 +128,7 @@ export default function CollectionTasks() {
     }
   
     try {
-      await axios.patch(`http://localhost:5000/api/tasks/${taskId}/toggle`, null, {
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/${taskId}/toggle`, null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchTasks();
@@ -147,7 +146,7 @@ export default function CollectionTasks() {
 
   const handleEditSubmit = async (taskId) => {
     try {
-      await axios.patch(`http://localhost:5000/api/tasks/${taskId}`, {
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/${taskId}`, {
         title: editingTitle,
         dueDate: editingDueDate || null,
         priority: editingPriority || null,
@@ -170,7 +169,7 @@ export default function CollectionTasks() {
   const handleDrop = async (draggedId, dropTargetId) => {
     if (draggedId === dropTargetId) return;
     try {
-      await axios.patch(`http://localhost:5000/api/tasks/${draggedId}`, {
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/tasks/${draggedId}`, {
         parent: dropTargetId,
       }, {
         headers: { Authorization: `Bearer ${token}` } ,

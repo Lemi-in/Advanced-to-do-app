@@ -19,7 +19,7 @@ export default function Dashboard() {
 
   const fetchCollections = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/collections', {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/collections`, {
         headers: {
           Authorization: `Bearer ${token}`, // ✅ must include Bearer
         },
@@ -34,7 +34,7 @@ export default function Dashboard() {
 
   const handleEdit = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/collections/${id}`, {
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/collections/${id}`, {
         name: editingName,
       }, {
         headers: { Authorization: token },
@@ -138,7 +138,7 @@ export default function Dashboard() {
               onCreate={async (name) => {
                 try {
                   await axios.post(
-                    'http://localhost:5000/api/collections',
+                    `${import.meta.env.VITE_BACKEND_URL}/api/collections`,
                     { name },
                     {
                       headers: {

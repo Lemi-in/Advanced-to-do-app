@@ -27,18 +27,18 @@ export default function Login() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, { email, password });
       console.log("Login response:", res.data);
     
       localStorage.setItem('token', res.data.token);
     
-      const profileRes = await axios.get('http://localhost:5000/api/auth/me', {
+      const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${res.data.token}` },
       });
     
       setTheme(profileRes.data.theme || 'light');
       navigate('/');
-      window.location.reload(); // 🔄 force full refresh after login
+      window.location.reload();
 
     } catch (err) {
       console.error('Login failed:', err);

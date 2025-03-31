@@ -18,7 +18,7 @@ export default function UserProfile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userRes = await axios.get('http://localhost:5000/api/auth/me', {
+        const userRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` } ,
         });
         const userData = userRes.data;
@@ -32,7 +32,7 @@ export default function UserProfile() {
 
     const fetchCollections = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/collections', {
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/collections`, {
           headers: { Authorization: `Bearer ${token}` } ,
         });
         setCollections(res.data);
@@ -52,7 +52,7 @@ export default function UserProfile() {
 
   const handleSave = async () => {
     try {
-      await axios.patch('http://localhost:5000/api/auth/me', {
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
         name,
         theme: themePref,
       }, {
