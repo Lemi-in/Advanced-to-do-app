@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { ThemeContext } from '../ThemeContext';
+
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -8,12 +12,15 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { setTheme } = useContext(ThemeContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    console.log("Trying to log in with:", email, password)
     if (!email || !password) {
       setError('Email and password are required');
       return;
+      ;
     }
 
     setLoading(true);
@@ -21,8 +28,18 @@ export default function Login() {
 
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      console.log("Login response:", res.data);
+    
       localStorage.setItem('token', res.data.token);
+    
+      const profileRes = await axios.get('http://localhost:5000/api/auth/me', {
+        headers: { Authorization: `Bearer ${res.data.token}` },
+      });
+    
+      setTheme(profileRes.data.theme || 'light');
       navigate('/');
+      window.location.reload(); // 🔄 force full refresh after login
+
     } catch (err) {
       console.error('Login failed:', err);
       setError('Invalid credentials');
@@ -33,16 +50,18 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen bg-white dark:bg-zinc-900 text-gray-900 dark:text-white flex-col justify-center px-6 py-12 lg:px-8">
+
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img
-          className="mx-auto h-10 w-auto"
-          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-          alt="Your Company"
-        />
+
+        <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-10 w-10 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 100-4H7a2 2 0 100 4zm0 6H7a2 2 0 100 4h10a2 2 0 100-4z" />
+        </svg>
+
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight">
           Sign in to your account
         </h2>
       </div>
+
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleLogin}>

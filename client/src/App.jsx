@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CollectionTasks from './pages/CollectionTasks';
 import ThemeProvider from './ThemeContext'; // <- Add this
+import UserProfile from './pages/UserProfile'; // <- Add this
 
 
 function App() {
@@ -18,6 +19,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/collection/:id" element={<CollectionTasks />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/collection/:id" element={<CollectionTasks />} />
+
+
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

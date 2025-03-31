@@ -3,6 +3,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../ThemeContext';
+import ProfileDropdown from '../components/ProfileDropdown';
+
 
 export default function CollectionTasks() {
   const { id } = useParams();
@@ -27,13 +29,29 @@ export default function CollectionTasks() {
   const [stats, setStats] = useState({ completed: 0, total: 0 });
   const [newReminder, setNewReminder] = useState('');
   const [editingReminder, setEditingReminder] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('All');
+  const [priorityFilters, setPriorityFilters] = useState({});
+  const [completionFilter, setCompletionFilter] = useState('All');
+
+ 
 
 
+
+  const isSameDate = (d1, d2) => {
+    return (
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
+      
+    );
+
+  };
+  
 
   const fetchCollections = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/collections', {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` } ,
       });
       setCollections(res.data);
     } catch (err) {
@@ -44,7 +62,7 @@ export default function CollectionTasks() {
   const fetchTasks = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/api/tasks/collection/${id}`, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` } ,
       });
       const tasksData = res.data.tasks;
       setTasks(tasksData);
@@ -78,7 +96,7 @@ export default function CollectionTasks() {
           collectionId: id,
           parent: parentId || null,
         },
-        { headers: { Authorization: token } }
+        { headers: { Authorization: `Bearer ${token}` }  }
       );
       setNewTask('');
       setNewDueDate('');
@@ -96,7 +114,7 @@ export default function CollectionTasks() {
     if (!window.confirm('Delete this task and all its subtasks?')) return;
     try {
       await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` } ,
       });
       fetchTasks();
     } catch (err) {
@@ -105,15 +123,27 @@ export default function CollectionTasks() {
   };
 
   const handleToggle = async (taskId) => {
+    if (!token) {
+      console.error('No token found — user likely logged out.');
+      return;
+    }
+  
     try {
       await axios.patch(`http://localhost:5000/api/tasks/${taskId}/toggle`, null, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       fetchTasks();
     } catch (err) {
       console.error('Toggle failed:', err);
+      if (err.response?.status === 401) {
+        alert('Session expired. Please log in again.');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
   };
+  
+  
 
   const handleEditSubmit = async (taskId) => {
     try {
@@ -123,7 +153,7 @@ export default function CollectionTasks() {
         priority: editingPriority || null,
         reminderDate: editingReminder || null, // 👈 Add this
       }, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` } ,
       });
       setEditingTask(null);
       setEditingTitle('');
@@ -143,7 +173,7 @@ export default function CollectionTasks() {
       await axios.patch(`http://localhost:5000/api/tasks/${draggedId}`, {
         parent: dropTargetId,
       }, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` } ,
       });
       fetchTasks();
     } catch (err) {
@@ -155,20 +185,35 @@ export default function CollectionTasks() {
     setExpanded((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
   };
 
-  const renderNestedTasks = (parent = null) =>
-    tasks
+  const renderNestedTasks = (parent = null) => {
+    const localFilter = priorityFilters[parent] || 'All';
+  
+    return tasks
       .filter((t) => t.parent === parent)
       .filter((t) =>
         t.title.toLowerCase().includes(searchQuery.toLowerCase())
       )
+      .filter((t) => priorityFilter === 'All' || t.priority === priorityFilter) 
+      .filter((t) => localFilter === 'All' || t.priority === localFilter)   
+      .filter((t) =>
+        completionFilter === 'All'
+          ? true
+          : completionFilter === 'Completed'
+          ? t.completed
+          : !t.completed
+      )
+      
       .map((task) => {
         const hasChildren = tasks.some((t) => t.parent === task._id);
         const isExpanded = expanded[task._id];
-
+  
         return (
           <li key={task._id} className="ml-4">
+           
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 p-2 border rounded bg-zinc-100 dark:bg-zinc-800">
               <div className="flex-1 w-full sm:w-auto flex items-center gap-2">
+                
                 {hasChildren && (
                   <button
                     onClick={() => toggleExpand(task._id)}
@@ -177,6 +222,7 @@ export default function CollectionTasks() {
                     {isExpanded ? '▼' : '▶'}
                   </button>
                 )}
+                
                 {editingTask === task._id ? (
                   <>
                     <input
@@ -223,23 +269,40 @@ export default function CollectionTasks() {
                           </span>
                         )}
                         {task.priority && (
-                          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-200 text-blue-700">
-                            {task.priority}
-                          </span>
+                    <span
+                    title={`Priority: ${task.priority}`}
+                    className="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-200 text-blue-700"
+                  >
+                    {task.priority}
+                  </span>
+                  
+                       
                         )}
-                        {task.reminder && (
-                          <span
-                            className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                              new Date(task.reminder).toDateString() === new Date().toDateString()
-                                ? 'bg-yellow-200 text-yellow-800'
-                                : new Date(task.reminder) < new Date()
-                                ? 'bg-red-200 text-red-800'
-                                : 'bg-green-200 text-green-800'
-                            }`}
+                     {task.reminderDate
+                        && (() => {
+                          const reminderDate = new Date(task.reminderDate
+                        );
+                          const today = new Date();
+
+                          let badgeClass = 'bg-green-200 text-green-800'; // upcoming
+
+                          if (isSameDate(reminderDate, today)) {
+                            badgeClass = 'bg-yellow-200 text-yellow-800'; // today
+                          } else if (reminderDate < today && !isSameDate(reminderDate, today)) {
+                            badgeClass = 'bg-red-200 text-red-800'; // overdue
+                          }
+
+                          return (
+                            <span
+                            title={`Reminder: ${reminderDate.toLocaleDateString()}`}
+                            className={`ml-2 text-xs px-2 py-0.5 rounded-full ${badgeClass}`}
                           >
-                            ⏰ {new Date(task.reminder).toLocaleDateString()}
+                            ⏰ {reminderDate.toLocaleDateString()}
                           </span>
-                        )}
+                          
+                          );
+                        })()}
+
 
                   </span>
                 )}
@@ -252,7 +315,8 @@ export default function CollectionTasks() {
                     setEditingTask(task._id);
                     setEditingTitle(task.title);
                     setEditingDueDate(task.dueDate || '');
-                    setEditingReminder(task.reminder || '');
+                    setEditingReminder(task.reminderDate
+ || '');
                     setEditingPriority(task.priority || '');
                   }} className="text-xs text-yellow-600 hover:underline">✏️</button>
                 )}
@@ -263,14 +327,47 @@ export default function CollectionTasks() {
                 <button onClick={() => handleDelete(task._id)} className="text-red-400 hover:text-red-600 text-sm">🗑️</button>
               </div>
             </div>
-            {isExpanded && <ul>{renderNestedTasks(task._id)}</ul>}
+            {isExpanded && (
+  <div className="ml-6 mt-2">
+    {/* Per-parent filter dropdown INSIDE the task */}
+    {hasChildren && (
+      <div className="mb-2">
+        <label className="mr-2 text-xs font-medium">Filter by Priority:</label>
+        <select
+          value={priorityFilters[task._id] || 'All'}
+          onChange={(e) =>
+            setPriorityFilters((prev) => ({
+              ...prev,
+              [task._id]: e.target.value,
+            }))
+          }
+          className="text-sm border rounded px-2 py-1"
+        >
+          <option value="All">All</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+      </div>
+    )}
+
+    {/* Render nested subtasks */}
+    <ul>{renderNestedTasks(task._id)}</ul>
+  </div>
+)}
+
           </li>
+          
         );
+        
       });
+
+    };
 
   useEffect(() => {
     fetchCollections();
     fetchTasks();
+    console.log('Fetching tasks')
   }, [id]);
 
   return (
@@ -308,6 +405,33 @@ export default function CollectionTasks() {
               className="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
             />
           </div>
+          <div className="mb-4">
+        <label className="mr-2 text-sm font-semibold">Global Priority Filter:</label>
+        <select
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value)}
+          className="border rounded px-3 py-1 text-sm"
+        >
+          <option value="All">All</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+
+      </div>
+
+      <div className="mb-4">
+        <label className="mr-2 text-sm font-semibold">Completion Filter:</label>
+        <select
+          value={completionFilter}
+          onChange={(e) => setCompletionFilter(e.target.value)}
+          className="border rounded px-3 py-1 text-sm"
+        >
+          <option value="All">All</option>
+          <option value="Completed">Completed</option>
+          <option value="Incomplete">Incomplete</option>
+        </select>
+      </div>
 
         <div className="flex justify-between mb-4 items-center">
           <h1 className="text-2xl font-bold">{collectionName} Tasks</h1>
@@ -321,12 +445,33 @@ export default function CollectionTasks() {
           </div>
         </div>
 
-          <button
+        <button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-sm px-3 py-1 rounded bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600"
+            className="text-sm px-3 py-1 rounded bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 flex items-center gap-2"
           >
-            Toggle {theme === 'dark' ? 'Light' : 'Dark'} Mode
+            {theme === 'dark' ? (
+              <>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="#facc15">
+
+
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                </svg>
+              </>
+            ) : (
+              <>
+
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="#60a5fa" viewBox="0 0 24 24">
+
+                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                </svg>
+              </>
+            )}
           </button>
+          <ProfileDropdown />
+
+
+
+
         </div>
 
         <Link to="/" className="text-sm text-indigo-500 hover:underline mb-4 inline-block">

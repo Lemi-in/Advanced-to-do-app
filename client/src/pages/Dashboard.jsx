@@ -4,6 +4,8 @@ import CollectionCard from '../components/CollectionCard';
 import AddCollectionModal from '../components/AddCollectionModal';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../ThemeContext';
+import ProfileDropdown from '../components/ProfileDropdown';
+
 
 export default function Dashboard() {
   const { theme, setTheme } = useContext(ThemeContext);
@@ -18,28 +20,17 @@ export default function Dashboard() {
   const fetchCollections = async () => {
     try {
       const res = await axios.get('http://localhost:5000/api/collections', {
-        headers: { Authorization: token },
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ must include Bearer
+        },
       });
-      setCollections(res.data);
+      setCollections(res.data); // ✅ this should update the UI
     } catch (err) {
       console.error('Error fetching collections:', err);
-      if (err.response?.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
     }
   };
-
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/collections/${id}`, {
-        headers: { Authorization: token },
-      });
-      fetchCollections();
-    } catch (err) {
-      alert('Could not delete');
-    }
-  };
+  
+  
 
   const handleEdit = async (id) => {
     try {
@@ -66,21 +57,33 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">My Task Collections</h1>
           <div className="flex items-center gap-4">
-            <button
+          <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="text-sm px-3 py-1 rounded bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600"
+              className="text-sm px-3 py-1 rounded bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 flex items-center gap-2"
             >
-              {theme === 'dark' ? 'Light' : 'Dark'} Mode
+              {theme === 'dark' ? (
+                <>
+                  {/* <span>Light</span> */}
+                  {/* 🌞 Sun icon for switching to light */}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="#facc15">
+
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                  </svg>
+                </>
+              ) : (
+                <>
+                  {/* <span>Dark</span> */}
+                  {/* 🌚 Moon icon for switching to dark */}
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="#60a5fa" viewBox="0 0 24 24">
+
+                    <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                  </svg>
+                </>
+              )}
             </button>
-            <button
-              onClick={() => {
-                localStorage.removeItem('token');
-                window.location.href = '/login';
-              }}
-              className="text-sm text-red-500 hover:underline"
-            >
-              Logout
-            </button>
+
+            <ProfileDropdown />
+
           </div>
         </div>
 
@@ -134,15 +137,23 @@ export default function Dashboard() {
               onClose={() => setShowModal(false)}
               onCreate={async (name) => {
                 try {
-                  await axios.post('http://localhost:5000/api/collections', { name }, {
-                    headers: { Authorization: token },
-                  });
+                  await axios.post(
+                    'http://localhost:5000/api/collections',
+                    { name },
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`, // ✅ add Bearer prefix just to be safe
+                      },
+                    }
+                  );
                   fetchCollections();
                   setShowModal(false);
                 } catch (err) {
+                  console.error('Failed to create collection:', err);
                   alert('Failed to create collection');
                 }
               }}
+              
             />
           )}
         </div>
