@@ -31,13 +31,14 @@ export default function Dashboard() {
   };
   
   
+  
 
   const handleEdit = async (id) => {
     try {
       await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/collections/${id}`, {
         name: editingName,
       }, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setEditingId(null);
       setEditingName('');
@@ -47,6 +48,19 @@ export default function Dashboard() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/collections/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchCollections(); // Refresh the collection list
+    } catch (err) {
+      console.error('Failed to delete collection:', err);
+      alert('Failed to delete collection');
+    }
+  };
+  
+
   useEffect(() => {
     fetchCollections();
   }, []);
@@ -55,7 +69,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">
       <div className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">My Task Collections</h1>
+          <h1 className="text-2xl font-bold">My Workspace</h1>
           <div className="flex items-center gap-4">
           <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

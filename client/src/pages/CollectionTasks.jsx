@@ -246,7 +246,7 @@ export default function CollectionTasks() {
                     <select
                       value={editingPriority}
                       onChange={(e) => setEditingPriority(e.target.value)}
-                      className="px-2 py-1 text-sm border rounded bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
+                      className="px-2 py-1 text-sm border rounded bg-black dark:bg-zinc-900 text-zinc-900 dark:text-white"
                     >
                       <option value="">Priority</option>
                       <option value="Low">Low</option>
@@ -281,12 +281,12 @@ export default function CollectionTasks() {
                         );
                           const today = new Date();
 
-                          let badgeClass = 'bg-green-200 text-green-800'; // upcoming
+                          let badgeClass = 'bg-green-200 text-green-800'; 
 
                           if (isSameDate(reminderDate, today)) {
-                            badgeClass = 'bg-yellow-200 text-yellow-800'; // today
+                            badgeClass = 'bg-yellow-200 text-yellow-800'; 
                           } else if (reminderDate < today && !isSameDate(reminderDate, today)) {
-                            badgeClass = 'bg-red-200 text-red-800'; // overdue
+                            badgeClass = 'bg-red-200 text-red-800'; 
                           }
 
                           return (
@@ -325,33 +325,33 @@ export default function CollectionTasks() {
               </div>
             </div>
             {isExpanded && (
-  <div className="ml-6 mt-2">
-    {/* Per-parent filter dropdown INSIDE the task */}
-    {hasChildren && (
-      <div className="mb-2">
-        <label className="mr-2 text-xs font-medium">Filter by Priority:</label>
-        <select
-          value={priorityFilters[task._id] || 'All'}
-          onChange={(e) =>
-            setPriorityFilters((prev) => ({
-              ...prev,
-              [task._id]: e.target.value,
-            }))
-          }
-          className="text-sm border rounded px-2 py-1"
-        >
-          <option value="All">All</option>
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
-      </div>
-    )}
+                <div className="ml-6 mt-2">
+                  {/* Per-parent filter dropdown INSIDE the task */}
+                  {hasChildren && (
+                    <div className="mb-2">
+                      <label className="mr-2 text-xs font-medium">Filter by Priority:</label>
+                      <select
+                        value={priorityFilters[task._id] || 'All'}
+                        onChange={(e) =>
+                          setPriorityFilters((prev) => ({
+                            ...prev,
+                            [task._id]: e.target.value,
+                          }))
+                        }
+                        className="text-sm border rounded px-2 py-1"
+                      >
+                        <option value="All">All</option>
+                        <option value="Low" className="text-black">Low</option>
+                        <option value="Medium" className="text-black">Medium</option>
+                        <option value="High" className="text-black">High</option>
+                      </select>
+                    </div>
+                  )}
 
-    {/* Render nested subtasks */}
-    <ul>{renderNestedTasks(task._id)}</ul>
-  </div>
-)}
+              
+                  <ul>{renderNestedTasks(task._id)}</ul>
+                </div>
+              )}
 
           </li>
           
@@ -407,12 +407,12 @@ export default function CollectionTasks() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="border rounded px-3 py-1 text-sm"
+          className="border rounded px-3 py-1 text-sm "
         >
-          <option value="All">All</option>
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
+          <option value="All" className="text-white">All</option>
+          <option value="Low" className="text-black">Low</option>
+          <option value="Medium"  className="text-black">Medium</option>
+          <option value="High"  className="text-black">High</option>
         </select>
 
       </div>
@@ -424,9 +424,9 @@ export default function CollectionTasks() {
           onChange={(e) => setCompletionFilter(e.target.value)}
           className="border rounded px-3 py-1 text-sm"
         >
-          <option value="All">All</option>
-          <option value="Completed">Completed</option>
-          <option value="Incomplete">Incomplete</option>
+          <option value="All" className="text-white">All</option>
+          <option value="Completed" className="text-black">Completed</option>
+          <option value="Incomplete" className="text-black">Incomplete</option>
         </select>
       </div>
 
