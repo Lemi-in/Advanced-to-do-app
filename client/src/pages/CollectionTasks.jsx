@@ -259,56 +259,57 @@ export default function CollectionTasks() {
                     </select>
                   </>
                 ) : (
-                  
-                  <span
-                    onClick={() => handleToggle(task._id)}
-                    className={`cursor-pointer flex-1 ${task.completed ? 'line-through text-zinc-400' : 'text-zinc-900 dark:text-white'}`}
-                  >
-                    {task.title}
-                        {task.dueDate && (
-                          <span className="ml-2 text-xs text-gray-500">
-                            (Due: {new Date(task.dueDate).toLocaleDateString()})
-                          </span>
-                        )}
-                        {task.priority && (
+
+                  <span className={`flex-1 ${task.completed ? 'line-through text-zinc-400' : 'text-zinc-900 dark:text-white'}`}>
+                  {task.title}
+                  {task.dueDate && (
+                    <span className="ml-2 text-xs text-gray-500">
+                      (Due: {new Date(task.dueDate).toLocaleDateString()})
+                    </span>
+                  )}
+                  {task.priority && (
                     <span
-                    title={`Priority: ${task.priority}`}
-                    className="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-200 text-blue-700"
-                  >
-                    {task.priority}
-                  </span>
-                  
-                       
-                        )}
-                     {task.reminderDate
-                        && (() => {
-                          const reminderDate = new Date(task.reminderDate
-                        );
-                          const today = new Date();
-
-                          let badgeClass = 'bg-green-200 text-green-800'; 
-
-                          if (isSameDate(reminderDate, today)) {
-                            badgeClass = 'bg-yellow-200 text-yellow-800'; 
-                          } else if (reminderDate < today && !isSameDate(reminderDate, today)) {
-                            badgeClass = 'bg-red-200 text-red-800'; 
-                          }
-
-                          return (
-                            <span
-                            title={`Reminder: ${reminderDate.toLocaleDateString()}`}
-                            className={`ml-2 text-xs px-2 py-0.5 rounded-full ${badgeClass}`}
-                          >
-                            ⏰ {reminderDate.toLocaleDateString()}
-                          </span>
-                          
-                          );
-                        })()}
-
-
-                  </span>
+                      title={`Priority: ${task.priority}`}
+                      className="ml-2 text-xs px-2 py-0.5 rounded-full bg-blue-200 text-blue-700"
+                    >
+                      {task.priority}
+                    </span>
+                  )}
+                  {task.reminderDate &&
+                    (() => {
+                      const reminderDate = new Date(task.reminderDate);
+                      const today = new Date();
+                      let badgeClass = 'bg-green-200 text-green-800';
+                
+                      if (isSameDate(reminderDate, today)) {
+                        badgeClass = 'bg-yellow-200 text-yellow-800';
+                      } else if (reminderDate < today && !isSameDate(reminderDate, today)) {
+                        badgeClass = 'bg-red-200 text-red-800';
+                      }
+                
+                      return (
+                        <span
+                          title={`Reminder: ${reminderDate.toLocaleDateString()}`}
+                          className={`ml-2 text-xs px-2 py-0.5 rounded-full ${badgeClass}`}
+                        >
+                          ⏰ {reminderDate.toLocaleDateString()}
+                        </span>
+                      );
+                    })()}
+                </span>
+                
                 )}
               </div>
+              <button
+                  onClick={() => handleToggle(task._id)}
+                  className={`text-xs px-2 py-1 mt-1 rounded ${
+                    task.completed
+                      ? 'bg-yellow-200 text-yellow-800 hover:bg-yellow-300'
+                      : 'bg-green-200 text-green-800 hover:bg-green-300'
+                  }`}
+                >
+                  {task.completed ? 'Unmark' : 'Mark Completed'}
+                </button>
               <div className="flex items-center gap-2">
                 {editingTask === task._id ? (
                     <>
