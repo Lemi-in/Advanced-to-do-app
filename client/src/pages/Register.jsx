@@ -20,10 +20,22 @@ export default function Register() {
     setError('');
 
     try {
+      // ✅ Updated URL
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, { email, password });
+
+      // ✅ Login after successful registration
       const loginRes = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, { email, password });
       localStorage.setItem('token', loginRes.data.token);
+
+      // ✅ Fetch user profile from updated /api/user/me route
+      const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/me`, {
+        headers: { Authorization: `Bearer ${loginRes.data.token}` },
+      });
+
+      // Optional: store or use theme/profile here if needed
+
       navigate('/');
+      window.location.reload(); // optional: reload app context
     } catch (err) {
       console.error('Registration failed:', err);
       if (err.response?.status === 409) {
@@ -40,7 +52,7 @@ export default function Register() {
     <div className="flex min-h-screen bg-white dark:bg-zinc-900 text-gray-900 dark:text-white flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-10 w-10 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m2 0a2 2 0 100-4H7a2 2 0 100 4zm0 6H7a2 2 0 100 4h10a2 2 0 100-4z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0-1.1.9-2 2-2s2 .9 2 2-1 2-2 2-2-.9-2-2zm-6 6c0-2.21 3.58-4 8-4s8 1.79 8 4v1H6v-1z" />
         </svg>
 
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight">
@@ -48,13 +60,10 @@ export default function Register() {
         </h2>
       </div>
 
-
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleRegister}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium">
-              Email address
-            </label>
+            <label htmlFor="email" className="block text-sm font-medium">Email address</label>
             <div className="mt-2">
               <input
                 type="email"
@@ -62,15 +71,13 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="block w-full rounded-md bg-white dark:bg-zinc-800 px-3 py-1.5 text-base text-gray-900 dark:text-white outline-1 -outline-offset-1 outline-gray-300 dark:outline-zinc-700 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white dark:bg-zinc-800 px-3 py-1.5 text-base text-gray-900 dark:text-white outline-1 outline-gray-300 dark:outline-zinc-700 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium">
-              Password
-            </label>
+            <label htmlFor="password" className="block text-sm font-medium">Password</label>
             <div className="mt-2">
               <input
                 type="password"
@@ -78,7 +85,7 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="block w-full rounded-md bg-white dark:bg-zinc-800 px-3 py-1.5 text-base text-gray-900 dark:text-white outline-1 -outline-offset-1 outline-gray-300 dark:outline-zinc-700 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600"
+                className="block w-full rounded-md bg-white dark:bg-zinc-800 px-3 py-1.5 text-base text-gray-900 dark:text-white outline-1 outline-gray-300 dark:outline-zinc-700 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600"
               />
             </div>
           </div>
@@ -87,7 +94,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-indigo-600"
             >
               {loading ? 'Registering...' : 'Register'}
             </button>
