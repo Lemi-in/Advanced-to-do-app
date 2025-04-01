@@ -400,7 +400,10 @@ export default function CollectionTasks() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white flex">
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-16'} border-r border-zinc-300 dark:border-zinc-700 p-4 transition-all duration-300 bg-zinc-50 dark:bg-zinc-900`}>
+
+        <aside className={`${sidebarOpen ? 'w-64' : 'w-16'} hidden sm:block border-r border-zinc-300 dark:border-zinc-700 p-4 transition-all duration-300 bg-zinc-50 dark:bg-zinc-900`}>
+
+
         <div className="flex justify-between items-center mb-4">
           {sidebarOpen && <h2 className="text-lg font-semibold">Collections</h2>}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-sm px-2 py-1 border rounded">
