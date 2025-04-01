@@ -21,6 +21,18 @@ export default function Login() {
       return;
       ;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
 
     setLoading(true);
     setError('');
@@ -31,7 +43,8 @@ export default function Login() {
     
       localStorage.setItem('token', res.data.token);
     
-      const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
+      const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/me`, {
+
         headers: { Authorization: `Bearer ${res.data.token}` },
       });
     

@@ -228,19 +228,23 @@ export default function CollectionTasks() {
                       placeholder="Edit title"
                       className="flex-1 px-2 py-1 text-sm border rounded bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
                     />
+                   <label className="text-xs text-gray-400">📅 Due</label>
                     <input
                       type="date"
                       value={editingDueDate || ''}
                       onChange={(e) => setEditingDueDate(e.target.value)}
                       className="px-2 py-1 text-sm border rounded bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
                     />
+
+                    <label className="text-xs text-gray-400">⏰ Reminder</label>
                     <input
-                          type="date"
-                          placeholder="Edit Reminder date"
-                          value={editingReminder}
-                          onChange={(e) => setEditingReminder(e.target.value)}
-                          className="px-2 py-1 text-sm border rounded bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
-                        />
+                      type="date"
+                      placeholder="Reminder date"
+                      value={editingReminder}
+                      onChange={(e) => setEditingReminder(e.target.value)}
+                      className="px-2 py-1 text-sm border rounded bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
+                    />
+
 
 
                     <select
@@ -255,6 +259,7 @@ export default function CollectionTasks() {
                     </select>
                   </>
                 ) : (
+                  
                   <span
                     onClick={() => handleToggle(task._id)}
                     className={`cursor-pointer flex-1 ${task.completed ? 'line-through text-zinc-400' : 'text-zinc-900 dark:text-white'}`}
@@ -306,17 +311,42 @@ export default function CollectionTasks() {
               </div>
               <div className="flex items-center gap-2">
                 {editingTask === task._id ? (
-                  <button onClick={() => handleEditSubmit(task._id)} className="text-xs text-green-600 hover:underline">Save</button>
-                ) : (
-                  <button onClick={() => {
-                    setEditingTask(task._id);
-                    setEditingTitle(task.title);
-                    setEditingDueDate(task.dueDate || '');
-                    setEditingReminder(task.reminderDate
- || '');
-                    setEditingPriority(task.priority || '');
-                  }} className="text-xs text-yellow-600 hover:underline">✏️</button>
-                )}
+                    <>
+                      <button
+                        onClick={() => handleEditSubmit(task._id)}
+                        className="text-xs text-green-600 hover:underline"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingTask(null);
+                          setEditingTitle('');
+                          setEditingDueDate('');
+                          setEditingReminder('');
+                          setEditingPriority('');
+                        }}
+                        className="text-xs text-red-500 hover:underline"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setEditingTask(task._id);
+                        setEditingTitle(task.title);
+                        setEditingDueDate(task.dueDate || '');
+                        setEditingReminder(task.reminderDate || '');
+                        setEditingPriority(task.priority || '');
+                      }}
+                      className="text-xs text-yellow-600 hover:underline"
+                    >
+                      ✏️
+                    </button>
+                  )}
+
+     
                 <button onClick={() => {
                   setParentId(task._id);
                   setShowModal(true);
@@ -504,19 +534,29 @@ export default function CollectionTasks() {
                 onChange={(e) => setNewTask(e.target.value)}
                 className="w-full px-3 py-2 mb-2 rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
               />
+             <label className="block text-sm font-medium mb-1">📅 Due Date</label>
               <input
                 type="date"
                 value={newDueDate}
                 onChange={(e) => setNewDueDate(e.target.value)}
                 className="w-full px-3 py-2 mb-2 rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
               />
+
+              <label className="block text-sm font-medium mb-1">⏰ Reminder Date</label>
               <input
                 type="date"
                 value={newReminder}
                 onChange={(e) => setNewReminder(e.target.value)}
                 className="w-full px-3 py-2 mb-2 rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
-                placeholder="Reminder date"
               />
+
+              {/* <input
+                type="date"
+                value={newReminder}
+                onChange={(e) => setNewReminder(e.target.value)}
+                className="w-full px-3 py-2 mb-2 rounded border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
+                placeholder="Reminder date"
+              /> */}
 
               <select
                 value={newPriority}

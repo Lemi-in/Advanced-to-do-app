@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { ThemeContext } from '../ThemeContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function UserProfile() {
   const [user, setUser] = useState(null);
@@ -18,8 +18,8 @@ export default function UserProfile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` } ,
+        const userRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/me`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         const userData = userRes.data;
         setUser(userData);
@@ -33,11 +33,10 @@ export default function UserProfile() {
     const fetchCollections = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/collections`, {
-          headers: { Authorization: `Bearer ${token}` } ,
+          headers: { Authorization: `Bearer ${token}` },
         });
         setCollections(res.data);
 
-        // Count tasks for progress
         const allTasks = res.data.flatMap(col => col.tasks || []);
         const completed = allTasks.filter(t => t.completed).length;
         setTaskStats({ completed, total: allTasks.length });
@@ -52,15 +51,15 @@ export default function UserProfile() {
 
   const handleSave = async () => {
     try {
-      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/user/me`, {
         name,
         theme: themePref,
       }, {
-        headers: { Authorization: `Bearer ${token}` } ,
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       setMessage('Profile updated successfully!');
-      setTheme(themePref); // update global theme context
+      setTheme(themePref);
     } catch (err) {
       console.error('Update failed:', err);
       setMessage('Failed to update profile');
@@ -69,7 +68,6 @@ export default function UserProfile() {
 
   if (!user) return <p className="text-center mt-10">Loading...</p>;
 
-  const firstCollectionId = collections.length > 0 ? collections[0]._id : null;
   const progress = taskStats.total > 0
     ? Math.round((taskStats.completed / taskStats.total) * 100)
     : 0;
@@ -130,16 +128,14 @@ export default function UserProfile() {
           </div>
         )}
 
-        {firstCollectionId && (
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => navigate(`/collection/${firstCollectionId}`)}
-              className="text-indigo-200 hover:underline text-sm"
-            >
-              ← Back to Dashboard
-            </button>
-          </div>
-        )}
+        <div className="mt-8 text-center">
+          <Link
+            to="/"
+            className="text-sm text-indigo-200 hover:text-indigo-100 underline"
+          >
+            ← Back to Dashboard
+          </Link>
+        </div>
       </div>
     </div>
   );

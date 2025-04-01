@@ -69,7 +69,28 @@ export default function Dashboard() {
     <div className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white">
       <div className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">My Workspace</h1>
+        <div className="flex items-center gap-3">
+            {/* Yellowish notebook icon */}
+            <div className="w-8 h-8 flex items-center justify-center rounded bg-yellow-200 text-yellow-800 shadow-inner">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 4h10M7 8h10M7 12h4m-6 4h6m4 0h2a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2h2"
+                />
+              </svg>
+            </div>
+
+            <h1 className="text-2xl font-bold">My Workspace</h1>
+          </div>
+
           <div className="flex items-center gap-4">
           <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -139,12 +160,22 @@ export default function Dashboard() {
             </div>
           ))}
 
-          <div
-            onClick={() => setShowModal(true)}
-            className="cursor-pointer border-2 border-dashed border-zinc-400 rounded-xl p-4 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700"
-          >
-            + Add New
-          </div>
+            <div
+              onClick={() => setShowModal(true)}
+              className="cursor-pointer border-2 border-dashed border-zinc-400 rounded-xl p-4 flex items-center gap-4 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition"
+            >
+              <div className="text-indigo-500">
+                {/* Notebook Icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v13m0 0a5 5 0 00-5-5H5a2 2 0 00-2 2v3m9-3a5 5 0 015 5h2a2 2 0 002-2v-3m0-10V5a2 2 0 00-2-2h-3a5 5 0 00-5 5m10 0h-3a5 5 0 00-5-5" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-base font-semibold">+ Add new</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">Click to create a new collection</p>
+              </div>
+            </div>
+
 
           {showModal && (
             <AddCollectionModal
