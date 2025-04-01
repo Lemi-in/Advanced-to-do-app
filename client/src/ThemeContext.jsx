@@ -8,7 +8,7 @@ export default function ThemeProvider({ children }) {
     return stored || 'light';
   });
 
-  // Apply theme to <html> tag
+
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');

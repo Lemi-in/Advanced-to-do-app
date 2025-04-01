@@ -32,22 +32,20 @@ export default function Register() {
     setError('');
 
     try {
-      // ✅ Updated URL
+  
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/register`, { email, password });
 
-      // ✅ Login after successful registration
       const loginRes = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, { email, password });
       localStorage.setItem('token', loginRes.data.token);
 
-      // ✅ Fetch user profile from updated /api/user/me route
+
       const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/user/me`, {
         headers: { Authorization: `Bearer ${loginRes.data.token}` },
       });
 
-      // Optional: store or use theme/profile here if needed
-
+  
       navigate('/');
-      window.location.reload(); // optional: reload app context
+      window.location.reload(); 
     } catch (err) {
       console.error('Registration failed:', err);
       if (err.response?.status === 409) {

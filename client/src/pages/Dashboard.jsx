@@ -21,10 +21,10 @@ export default function Dashboard() {
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/collections`, {
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ must include Bearer
+          Authorization: `Bearer ${token}`,
         },
       });
-      setCollections(res.data); // ✅ this should update the UI
+      setCollections(res.data); 
     } catch (err) {
       console.error('Error fetching collections:', err);
     }
@@ -53,7 +53,7 @@ export default function Dashboard() {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/collections/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchCollections(); // Refresh the collection list
+      fetchCollections(); 
     } catch (err) {
       console.error('Failed to delete collection:', err);
       alert('Failed to delete collection');
@@ -70,7 +70,7 @@ export default function Dashboard() {
       <div className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-3">
-            {/* Yellowish notebook icon */}
+         
             <div className="w-8 h-8 flex items-center justify-center rounded bg-yellow-200 text-yellow-800 shadow-inner">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -187,7 +187,7 @@ export default function Dashboard() {
                     { name },
                     {
                       headers: {
-                        Authorization: `Bearer ${token}`, // ✅ add Bearer prefix just to be safe
+                        Authorization: `Bearer ${token}`,
                       },
                     }
                   );
